@@ -1,35 +1,52 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Correct import
+import { View, StyleSheet } from 'react-native';
+import { Text, Switch, Dropdown, Provider as PaperProvider } from 'react-native-paper';
 
-const ProfileSettings = ({ navigation }) => {
-  const [languagePreference, setLanguagePreference] = useState('pl'); // Default: Polish
+const LANGUAGE_OPTIONS = [
+  { label: 'English', value: 'english' },
+  { label: 'Spanish', value: 'spanish' },
+  { label: 'French', value: 'french' },
+  { label: 'German', value: 'german' },
+];
 
-  const savePreferences = () => {
-    Alert.alert('Zapisano', `Preferencje językowe ustawione na: ${languagePreference}`);
-    navigation.goBack();
+const ProfileSettings = () => {
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false); // Notification toggle state
+  const [selectedLanguage, setSelectedLanguage] = useState('english'); // Default language
+
+  // Toggle notifications
+  const toggleNotifications = () => {
+    setNotificationsEnabled(!notificationsEnabled);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Ustawienia konta</Text>
+    <PaperProvider>
+      <View style={styles.container}>
+        <Text style={styles.header}>Profile Settings</Text>
 
-      <Text style={styles.subHeader}>Preferencje językowe</Text>
-      <Picker
-        selectedValue={languagePreference}
-        style={styles.picker}
-        onValueChange={(itemValue) => setLanguagePreference(itemValue)}
-      >
-        <Picker.Item label="Polski" value="pl" />
-        <Picker.Item label="Angielski" value="en" />
-        <Picker.Item label="Niemiecki" value="de" />
-        <Picker.Item label="Francuski" value="fr" />
-      </Picker>
+        {/* Notifications Toggle */}
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Enable Notifications</Text>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={toggleNotifications}
+            color="#007bff"
+          />
+        </View>
 
-      <TouchableOpacity style={styles.saveButton} onPress={savePreferences}>
-        <Text style={styles.saveButtonText}>Zapisz preferencje</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Dropdown for Language Selection */}
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Select Language</Text>
+          <Dropdown
+            label="Language"
+            placeholder="Select Language"
+            options={LANGUAGE_OPTIONS}
+            value={selectedLanguage}
+            onSelect={setSelectedLanguage}
+            style={styles.dropdown}
+          />
+        </View>
+      </View>
+    </PaperProvider>
   );
 };
 
@@ -45,29 +62,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  subHeader: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderColor: '#ccc',
-    borderWidth: 1,
-  },
-  saveButton: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 8,
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 20,
   },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  settingLabel: {
+    fontSize: 18,
     fontWeight: 'bold',
+  },
+  dropdown: {
+    width: 150,
   },
 });
 

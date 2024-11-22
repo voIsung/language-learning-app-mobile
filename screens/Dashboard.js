@@ -1,35 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet, ProgressBarAndroid } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Card, Chip, ProgressBar } from 'react-native-paper';
 
 const Dashboard = () => {
-  // Mocked data for progress summary
-  const progress = 0.7; // 70% progress
-  const completedLessons = 15;
-  const completedExercises = 30;
+  // Mocked data for progress and levels
+  const progress = 0.6; // 60% progress
+  const difficultyLevels = ['Beginner', 'Intermediate', 'Advanced'];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Podsumowanie postępów w nauce</Text>
+      <Text style={styles.header}>Dashboard</Text>
 
-      {/* Overall Progress */}
-      <Text style={styles.sectionTitle}>Ogólny postęp:</Text>
-      <ProgressBarAndroid 
-        styleAttr="Horizontal" 
-        indeterminate={false} 
-        progress={progress} 
-        color="#007bff"
-        style={styles.progressBar}
-      />
-      <Text style={styles.progressText}>{Math.round(progress * 100)}%</Text>
+      {/* Card for Progress Summary */}
+      <Card style={styles.card}>
+        <Card.Title title="Progress Summary" />
+        <Card.Content>
+          <Text style={styles.progressLabel}>Lessons Completed</Text>
+          <ProgressBar progress={progress} color="#007bff" style={styles.progressBar} />
+          <Text style={styles.progressText}>{Math.round(progress * 100)}% Completed</Text>
+        </Card.Content>
+      </Card>
 
-      {/* Completed Lessons */}
-      <View style={styles.summaryContainer}>
-        <Text style={styles.summaryText}>Ukończone lekcje: {completedLessons}</Text>
-      </View>
-
-      {/* Completed Exercises */}
-      <View style={styles.summaryContainer}>
-        <Text style={styles.summaryText}>Ukończone ćwiczenia: {completedExercises}</Text>
+      {/* Difficulty Levels */}
+      <Text style={styles.sectionHeader}>Difficulty Levels</Text>
+      <View style={styles.chipContainer}>
+        {difficultyLevels.map((level, index) => (
+          <Chip key={index} style={styles.chip}>
+            {level}
+          </Chip>
+        ))}
       </View>
     </View>
   );
@@ -47,33 +46,36 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  sectionTitle: {
+  card: {
+    marginBottom: 20,
+    elevation: 3,
+  },
+  progressLabel: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: 10,
+    borderRadius: 5,
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#555',
+  },
+  sectionHeader: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 10,
   },
-  progressBar: {
-    height: 20,
-    marginVertical: 10,
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
   },
-  progressText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  summaryContainer: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  summaryText: {
-    fontSize: 16,
+  chip: {
+    margin: 4,
+    backgroundColor: '#e3f2fd',
   },
 });
 

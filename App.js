@@ -3,6 +3,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { PaperProvider } from 'react-native-paper';
 import LoginRegisterScreen from './screens/LoginRegisterScreen';
 import Dashboard from './screens/Dashboard';
 import Lessons from './screens/Lessons';
@@ -27,6 +28,7 @@ function DrawerNavigator() {
 
 export default function App() {
   return (
+    <PaperProvider>
     <LanguageProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="LoginRegister">
@@ -53,6 +55,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </LanguageProvider>
+    </PaperProvider>
   );
 }
 

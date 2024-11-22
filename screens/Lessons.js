@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { List, Avatar, Button, Tooltip } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
 const Lessons = () => {
@@ -7,30 +8,61 @@ const Lessons = () => {
 
   // Mocked data for lessons
   const lessons = [
-    { id: '1', title: 'Podstawy React Native', difficulty: 'Łatwy' },
-    { id: '2', title: 'Zaawansowane komponenty', difficulty: 'Średni' },
-    { id: '3', title: 'Integracja z API', difficulty: 'Trudny' },
+    { id: '1', title: 'Introduction to Grammar', status: 'completed', tooltip: 'Learn the basics of grammar.' },
+    { id: '2', title: 'Intermediate Vocabulary', status: 'in-progress', tooltip: 'Expand your vocabulary.' },
+    { id: '3', title: 'Advanced Writing', status: 'not-started', tooltip: 'Improve your writing skills.' },
   ];
 
-  // Navigate to the lesson details screen
-  const navigateToDetails = (lessonId) => {
+  // Navigate to LessonDetails screen
+  const handleStartLesson = (lessonId) => {
     navigation.navigate('LessonDetails', { lessonId });
   };
 
   // Render each lesson item
-  const renderLessonItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.lessonItem}
-      onPress={() => navigateToDetails(item.id)}
-    >
-      <Text style={styles.lessonTitle}>{item.title}</Text>
-      <Text style={styles.lessonDifficulty}>Poziom: {item.difficulty}</Text>
-    </TouchableOpacity>
-  );
+  const renderLessonItem = ({ item }) => {
+    // Determine icon based on status
+    let statusIcon;
+    switch (item.status) {
+      case 'completed':
+        statusIcon = 'check-circle'; // Completed
+        break;
+      case 'in-progress':
+        statusIcon = 'progress-clock'; // In Progress
+        break;
+      default:
+        statusIcon = 'circle-outline'; // Not Started
+    }
+
+    return (
+      <List.Item
+        title={item.title}
+        description={`Status: ${item.status}`}
+        left={() => (
+          <Avatar.Icon 
+            size={40} 
+            icon={statusIcon} 
+            style={[styles.avatar, item.status === 'completed' && styles.completedIcon]} 
+          />
+        )}
+        right={() => (
+          <Tooltip title={item.tooltip}>
+            <Button 
+              mode="contained" 
+              style={styles.startButton} 
+              onPress={() => handleStartLesson(item.id)}
+            >
+              Start
+            </Button>
+          </Tooltip>
+        )}
+        style={styles.listItem}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Lista lekcji</Text>
+      <Text style={styles.header}>Lessons</Text>
       <FlatList
         data={lessons}
         keyExtractor={(item) => item.id}
@@ -56,24 +88,20 @@ const styles = StyleSheet.create({
   list: {
     paddingBottom: 20,
   },
-  lessonItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
+  listItem: {
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    backgroundColor: '#fff',
+    borderRadius: 8,
     elevation: 2,
   },
-  lessonTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+  avatar: {
+    backgroundColor: '#e0e0e0',
   },
-  lessonDifficulty: {
-    fontSize: 14,
-    color: '#555',
+  completedIcon: {
+    backgroundColor: '#4caf50',
+  },
+  startButton: {
+    backgroundColor: '#007bff',
   },
 });
 
