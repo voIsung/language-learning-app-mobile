@@ -7,9 +7,9 @@ const Exercises = () => {
 
   // Mocked data for exercise types
   const exerciseTypes = [
-    { id: '1', type: 'Gramatyka', description: 'Ćwiczenia związane z gramatyką' },
-    { id: '2', type: 'Słownictwo', description: 'Rozwijanie zasobu słownictwa' },
-    { id: '3', type: 'Pisanie', description: 'Zadania rozwijające umiejętność pisania' },
+    { id: '1', type: 'Grammar', description: 'Exercises to improve your grammar' },
+    { id: '2', type: 'Vocabulary', description: 'Expand your vocabulary' },
+    { id: '3', type: 'Writing', description: 'Check your writing skills' },
   ];
 
   // Navigate to the exercise tasks screen
@@ -30,7 +30,7 @@ const Exercises = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Rodzaje ćwiczeń</Text>
+      <Text style={styles.header}>Exercise Types</Text>
       <FlatList
         data={exerciseTypes}
         keyExtractor={(item) => item.id}

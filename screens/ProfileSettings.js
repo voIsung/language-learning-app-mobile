@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text, Switch, Dropdown, Provider as PaperProvider } from 'react-native-paper';
-
-const LANGUAGE_OPTIONS = [
-  { label: 'English', value: 'english' },
-  { label: 'Spanish', value: 'spanish' },
-  { label: 'French', value: 'french' },
-  { label: 'German', value: 'german' },
-];
+import { View, Text, StyleSheet } from 'react-native';
+import { Switch, Button, Menu, Divider, Provider as PaperProvider } from 'react-native-paper';
 
 const ProfileSettings = () => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false); // Notification toggle state
-  const [selectedLanguage, setSelectedLanguage] = useState('english'); // Default language
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false); // State for notifications toggle
+  const [language, setLanguage] = useState('English'); // Default language
+  const [menuVisible, setMenuVisible] = useState(false); // State for dropdown menu visibility
 
   // Toggle notifications
   const toggleNotifications = () => {
     setNotificationsEnabled(!notificationsEnabled);
+  };
+
+  // Dropdown menu handlers
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
+
+  // Handle language selection
+  const selectLanguage = (lang) => {
+    setLanguage(lang);
+    closeMenu();
   };
 
   return (
@@ -33,17 +37,27 @@ const ProfileSettings = () => {
           />
         </View>
 
-        {/* Dropdown for Language Selection */}
+        {/* Language Dropdown */}
         <View style={styles.settingRow}>
           <Text style={styles.settingLabel}>Select Language</Text>
-          <Dropdown
-            label="Language"
-            placeholder="Select Language"
-            options={LANGUAGE_OPTIONS}
-            value={selectedLanguage}
-            onSelect={setSelectedLanguage}
-            style={styles.dropdown}
-          />
+          <Menu
+            visible={menuVisible}
+            onDismiss={closeMenu}
+            anchor={
+              <Button
+                mode="outlined"
+                onPress={openMenu}
+                style={styles.dropdownButton}
+              >
+                {language}
+              </Button>
+            }
+          >
+            <Menu.Item onPress={() => selectLanguage('English')} title="English" />
+            <Menu.Item onPress={() => selectLanguage('Spanish')} title="Spanish" />
+            <Menu.Item onPress={() => selectLanguage('French')} title="French" />
+            <Menu.Item onPress={() => selectLanguage('German')} title="German" />
+          </Menu>
         </View>
       </View>
     </PaperProvider>
@@ -72,7 +86,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  dropdown: {
+  dropdownButton: {
     width: 150,
   },
 });

@@ -8,8 +8,8 @@ const LessonDetails = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Szczegóły lekcji</Text>
-      <Text style={styles.detailText}>Wybrany lessonId: {lessonId}</Text>
+      <Text style={styles.header}>Lesson details</Text>
+      <Text style={styles.detailText}>Lesson number: {lessonId}</Text>
       {/* You can add more details about the lesson based on the lessonId here */}
     </View>
   );

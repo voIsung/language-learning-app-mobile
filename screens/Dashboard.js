@@ -1,17 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Card, Chip, ProgressBar } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Text, Button, Card, ProgressBar } from 'react-native-paper';
+
+const DIFFICULTY_LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
 
 const Dashboard = () => {
-  // Mocked data for progress and levels
-  const progress = 0.6; // 60% progress
-  const difficultyLevels = ['Beginner', 'Intermediate', 'Advanced'];
+  const progress = 0.6; // Example progress (60%)
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Dashboard</Text>
 
-      {/* Card for Progress Summary */}
+      {/* Progress Summary Card */}
       <Card style={styles.card}>
         <Card.Title title="Progress Summary" />
         <Card.Content>
@@ -22,12 +22,17 @@ const Dashboard = () => {
       </Card>
 
       {/* Difficulty Levels */}
-      <Text style={styles.sectionHeader}>Difficulty Levels</Text>
-      <View style={styles.chipContainer}>
-        {difficultyLevels.map((level, index) => (
-          <Chip key={index} style={styles.chip}>
+      <Text style={styles.subHeader}>Select Difficulty Level</Text>
+      <View style={styles.difficultyContainer}>
+        {DIFFICULTY_LEVELS.map((level) => (
+          <Button
+            key={level}
+            mode="contained"
+            onPress={() => console.log(`${level} selected`)} // Placeholder action
+            style={styles.difficultyButton}
+          >
             {level}
-          </Chip>
+          </Button>
         ))}
       </View>
     </View>
@@ -63,19 +68,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
   },
-  sectionHeader: {
+  subHeader: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginBottom: 10,
+    textAlign: 'center',
   },
-  chipContainer: {
+  difficultyContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    justifyContent: 'flex-start',
+    marginLeft: -15,
+    marginVertical: 20,
   },
-  chip: {
-    margin: 4,
-    backgroundColor: '#e3f2fd',
+  difficultyButton: {
+    marginHorizontal: 5,
+    borderRadius: 10,
+    backgroundColor: '#007bff',
   },
 });
 

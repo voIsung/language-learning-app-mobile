@@ -10,7 +10,7 @@ import Lessons from './screens/Lessons';
 import Exercises from './screens/Exercises';
 import ProfileSettings from './screens/ProfileSettings';
 import LessonDetails from './screens/LessonDetails';
-import ExerciseTasks from './screens/ExerciseTasks'; // Import the new screen
+import ExerciseTasks from './screens/ExerciseTasks';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -45,12 +45,12 @@ export default function App() {
           <Stack.Screen
             name="LessonDetails"
             component={LessonDetails}
-            options={{ title: 'Szczegóły lekcji' }}
+            options={{ title: 'Lesson Details' }}
           />
           <Stack.Screen
             name="ExerciseTasks"
             component={ExerciseTasks}
-            options={{ title: 'Zadania ćwiczeń' }}
+            options={{ title: 'Exercise' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
