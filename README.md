@@ -1,2 +1,2 @@
-npx expo start
+npx expo start;
 npm i
