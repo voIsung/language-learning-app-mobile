@@ -1,25 +1,42 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Switch, Button, Menu, Divider, Provider as PaperProvider } from 'react-native-paper';
+import { Switch, Button, Menu, Provider as PaperProvider } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { useAppContext } from '../context/AppContext';
+import { getFromSecureStore, deleteFromSecureStore } from '../utils/SecureStoreUtils';
+
+const TOKEN_KEY = 'userToken';
 
 const ProfileSettings = () => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false); // State for notifications toggle
-  const [language, setLanguage] = useState('English'); // Default language
-  const [menuVisible, setMenuVisible] = useState(false); // State for dropdown menu visibility
+  const navigation = useNavigation();
+  const { languagePreferences, setLanguagePreferences } = useAppContext();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [retrievedToken, setRetrievedToken] = useState(null);
 
-  // Toggle notifications
   const toggleNotifications = () => {
     setNotificationsEnabled(!notificationsEnabled);
   };
 
-  // Dropdown menu handlers
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
 
-  // Handle language selection
   const selectLanguage = (lang) => {
-    setLanguage(lang);
+    setLanguagePreferences(lang);
     closeMenu();
+  };
+
+  const handleRetrieveToken = async () => {
+    const token = await getFromSecureStore(TOKEN_KEY);
+    setRetrievedToken(token);
+    console.log('Retrieved Token:', token);
+  };
+
+  const handleLogout = async () => {
+    await deleteFromSecureStore(TOKEN_KEY); // Clear the token
+    setRetrievedToken(null); // Clear retrieved token state
+    console.log('User logged out');
+    navigation.replace('LoginRegister'); // Navigate back to login screen
   };
 
   return (
@@ -49,7 +66,7 @@ const ProfileSettings = () => {
                 onPress={openMenu}
                 style={styles.dropdownButton}
               >
-                {language}
+                {languagePreferences}
               </Button>
             }
           >
@@ -59,6 +76,28 @@ const ProfileSettings = () => {
             <Menu.Item onPress={() => selectLanguage('German')} title="German" />
           </Menu>
         </View>
+
+        {/* Retrieve Token Button */}
+        <Button
+          mode="contained"
+          onPress={handleRetrieveToken}
+          style={styles.tokenButton}
+        >
+          Retrieve Token
+        </Button>
+
+        {retrievedToken && (
+          <Text style={styles.tokenText}>Token: {retrievedToken}</Text>
+        )}
+
+        {/* Logout Button */}
+        <Button
+          mode="contained"
+          onPress={handleLogout}
+          style={styles.logoutButton}
+        >
+          Logout
+        </Button>
       </View>
     </PaperProvider>
   );
@@ -88,6 +127,23 @@ const styles = StyleSheet.create({
   },
   dropdownButton: {
     width: 150,
+  },
+  tokenButton: {
+    backgroundColor: '#007bff',
+    marginBottom: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  logoutButton: {
+    backgroundColor: '#d9534f',
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  tokenText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
   },
 });
 

@@ -1,5 +1,5 @@
 import './gesture-handler';
-import { LanguageProvider } from './context/LanguageContext';
+import { AppProvider } from './context/AppContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -11,7 +11,8 @@ import Exercises from './screens/Exercises';
 import ProfileSettings from './screens/ProfileSettings';
 import LessonDetails from './screens/LessonDetails';
 import ExerciseTasks from './screens/ExerciseTasks';
-
+import { Text } from 'react-native';
+ 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -29,33 +30,32 @@ function DrawerNavigator() {
 export default function App() {
   return (
     <PaperProvider>
-    <LanguageProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="LoginRegister">
-          <Stack.Screen
-            name="LoginRegister"
-            component={LoginRegisterScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Home"
-            component={DrawerNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="LessonDetails"
-            component={LessonDetails}
-            options={{ title: 'Lesson Details' }}
-          />
-          <Stack.Screen
-            name="ExerciseTasks"
-            component={ExerciseTasks}
-            options={{ title: 'Exercise' }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </LanguageProvider>
+      <AppProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="LoginRegister">
+            <Stack.Screen
+              name="LoginRegister"
+              component={LoginRegisterScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Home"
+              component={DrawerNavigator}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="LessonDetails"
+              component={LessonDetails}
+              options={{ title: <Text>Lesson Details</Text> }} // Wrap the title in <Text>
+            />
+            <Stack.Screen
+              name="ExerciseTasks"
+              component={ExerciseTasks}
+              options={{ title: <Text>Exercise</Text> }} // Wrap the title in <Text>
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AppProvider>
     </PaperProvider>
   );
 }
-

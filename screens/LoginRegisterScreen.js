@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { saveToSecureStore, deleteFromSecureStore } from '../utils/SecureStoreUtils';
+
+const TOKEN_KEY = 'userToken';
 
 const LoginRegisterScreen = () => {
   const navigation = useNavigation();
-  const [isRegister, setIsRegister] = useState(false);
+  const [isRegister, setIsRegister] = useState(false); // Toggle between Login and Register
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,11 +16,12 @@ const LoginRegisterScreen = () => {
     setIsRegister(!isRegister);
   };
 
-  const handleLogin = () => {
-    // Mock authentication
+  const handleLogin = async () => {
     if (email && password) {
-      console.log('Logging in with:', email, password);
-      navigation.navigate('Home');
+      const token = 'mockAuthToken123'; // Replace with real token
+      await saveToSecureStore(TOKEN_KEY, token);
+      console.log('Logging in with token:', token);
+      navigation.navigate('Home'); // Navigate to your main screen (e.g., Dashboard)
     } else {
       alert('Please enter valid credentials');
     }
@@ -28,8 +32,13 @@ const LoginRegisterScreen = () => {
       alert('Passwords do not match');
       return;
     }
-    // Handle registration logic here
     console.log('Registering with:', email, password);
+    // Add your registration logic here
+  };
+
+  const handleLogout = async () => {
+    await deleteFromSecureStore(TOKEN_KEY);
+    console.log('User logged out');
   };
 
   return (
@@ -67,12 +76,16 @@ const LoginRegisterScreen = () => {
         style={styles.button}
         onPress={isRegister ? handleRegister : handleLogin}
       >
-        <Text style={styles.buttonText}>{isRegister ? 'Register' : 'Login'}</Text>
+        <Text style={styles.buttonText}>
+          {isRegister ? 'Register' : 'Login'}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={toggleForm}>
         <Text style={styles.toggleText}>
-          {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
+          {isRegister
+            ? 'Already have an account? Login'
+            : "Don't have an account? Register"}
         </Text>
       </TouchableOpacity>
     </View>
@@ -119,6 +132,7 @@ const styles = StyleSheet.create({
   toggleText: {
     color: '#007bff',
     fontSize: 16,
+    textAlign: 'center',
   },
 });
 

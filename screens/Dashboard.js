@@ -1,17 +1,22 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button, Card, ProgressBar } from 'react-native-paper';
+import { useAppContext } from '../context/AppContext';
 
 const DIFFICULTY_LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
 
 const Dashboard = () => {
-  const progress = 0.6; // Example progress (60%)
+  const { currentSkillLevel, setCurrentSkillLevel, lessonHistory } = useAppContext();
+
+  const totalLessons = 3; // Total number of lessons
+  const completedLessons = lessonHistory.filter((lesson) => lesson.status === 'completed').length;
+  const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) / 100 : 0;
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Dashboard</Text>
 
-      {/* Progress Summary Card */}
+      {/* Progress Summary */}
       <Card style={styles.card}>
         <Card.Title title="Progress Summary" />
         <Card.Content>
@@ -21,14 +26,14 @@ const Dashboard = () => {
         </Card.Content>
       </Card>
 
-      {/* Difficulty Levels */}
+      {/* Skill Level Selection */}
       <Text style={styles.subHeader}>Select Difficulty Level</Text>
       <View style={styles.difficultyContainer}>
         {DIFFICULTY_LEVELS.map((level) => (
           <Button
             key={level}
-            mode="contained"
-            onPress={() => console.log(`${level} selected`)} // Placeholder action
+            mode={currentSkillLevel === level ? 'contained' : 'outlined'}
+            onPress={() => setCurrentSkillLevel(level)}
             style={styles.difficultyButton}
           >
             {level}
@@ -53,7 +58,6 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: 20,
-    elevation: 3,
   },
   progressLabel: {
     fontSize: 16,
@@ -62,7 +66,6 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 10,
     borderRadius: 5,
-    marginBottom: 8,
   },
   progressText: {
     fontSize: 14,
@@ -76,14 +79,12 @@ const styles = StyleSheet.create({
   },
   difficultyContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginLeft: -15,
+    justifyContent: 'center',
     marginVertical: 20,
   },
   difficultyButton: {
     marginHorizontal: 5,
     borderRadius: 10,
-    backgroundColor: '#007bff',
   },
 });
 

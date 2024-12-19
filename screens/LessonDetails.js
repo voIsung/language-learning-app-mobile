@@ -1,16 +1,37 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { Button } from 'react-native-paper';
+import { useAppContext } from '../context/AppContext';
 
-const LessonDetails = () => {
-  const route = useRoute();
-  const { lessonId } = route.params;
+const LessonDetails = ({ route }) => {
+  const { lessonId, lessonTitle } = route.params;
+  const { lessonHistory, setLessonHistory } = useAppContext();
+
+  const isLessonCompleted = (lessonId) =>
+    lessonHistory.some((lesson) => lesson.lessonId === lessonId);
+
+  const markLessonCompleted = () => {
+    if (!isLessonCompleted(lessonId)) {
+      const updatedLessonHistory = [...lessonHistory, { lessonId, status: 'completed' }];
+      setLessonHistory(updatedLessonHistory);
+      console.log('Lesson marked as completed:', lessonId, updatedLessonHistory);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Lesson details</Text>
-      <Text style={styles.detailText}>Lesson number: {lessonId}</Text>
-      {/* You can add more details about the lesson based on the lessonId here */}
+      <Text style={styles.header}>{lessonTitle}</Text>
+      <Text style={styles.lessonContent}>
+        This is the content of the lesson. Here, you can add detailed information, examples, and exercises for the user to complete.
+      </Text>
+      <Button
+        mode="contained"
+        onPress={markLessonCompleted}
+        disabled={isLessonCompleted(lessonId)}
+        style={styles.markButton}
+      >
+        {isLessonCompleted(lessonId) ? 'Completed' : 'Mark as Completed'}
+      </Button>
     </View>
   );
 };
@@ -19,7 +40,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     fontSize: 24,
@@ -27,8 +47,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  detailText: {
-    fontSize: 18,
+  lessonContent: {
+    fontSize: 16,
+    marginBottom: 20,
+    lineHeight: 24,
+    textAlign: 'justify',
+  },
+  markButton: {
+    backgroundColor: '#4caf50',
+    marginTop: 20,
   },
 });
 

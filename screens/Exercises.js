@@ -1,42 +1,82 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import { List, Avatar, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { useAppContext } from '../context/AppContext';
 
 const Exercises = () => {
+  const { exerciseResults, setExerciseResults } = useAppContext();
   const navigation = useNavigation();
+  const [isResetting, setIsResetting] = useState(false);
 
-  // Mocked data for exercise types
-  const exerciseTypes = [
-    { id: '1', type: 'Grammar', description: 'Exercises to improve your grammar' },
-    { id: '2', type: 'Vocabulary', description: 'Expand your vocabulary' },
-    { id: '3', type: 'Writing', description: 'Check your writing skills' },
+  const exercises = [
+    { id: '1', title: 'Grammar Exercise' },
+    { id: '2', title: 'Vocabulary Quiz' },
+    { id: '3', title: 'Writing Challenge' },
   ];
 
-  // Navigate to the exercise tasks screen
-  const navigateToTasks = (exerciseType) => {
-    navigation.navigate('ExerciseTasks', { exerciseType });
+  const resetScores = () => {
+    Alert.alert(
+      'Reset Scores',
+      'Are you sure you want to reset all exercise scores?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: () => {
+            setIsResetting(true);
+            setExerciseResults([]);
+            setTimeout(() => {
+              setIsResetting(false);
+              console.log('All exercise scores reset');
+            }, 500);
+          },
+        },
+      ]
+    );
   };
 
-  // Render each exercise type
-  const renderExerciseItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.exerciseItem}
-      onPress={() => navigateToTasks(item.type)}
-    >
-      <Text style={styles.exerciseType}>{item.type}</Text>
-      <Text style={styles.exerciseDescription}>{item.description}</Text>
-    </TouchableOpacity>
-  );
+  const renderExerciseItem = ({ item }) => {
+    const score = exerciseResults.find((exercise) => exercise.exerciseId === item.id)?.score;
+
+    return (
+      <List.Item
+        title={item.title}
+        description={score !== undefined ? `Score: ${score}` : 'Not Attempted'}
+        left={() => (
+          <Avatar.Icon size={40} icon="pencil" style={styles.avatar} />
+        )}
+        right={() => (
+          <Button
+            mode="contained"
+            onPress={() => navigation.navigate('ExerciseTasks', { exerciseType: item.id })}
+            style={styles.startButton}
+          >
+            Start Exercise
+          </Button>
+        )}
+        style={styles.listItem}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Exercise Types</Text>
       <FlatList
-        data={exerciseTypes}
+        data={exercises}
         keyExtractor={(item) => item.id}
         renderItem={renderExerciseItem}
         contentContainerStyle={styles.list}
       />
+      <Button
+        mode="contained"
+        onPress={resetScores}
+        style={styles.resetButton}
+        loading={isResetting}
+      >
+        Reset All Scores
+      </Button>
     </View>
   );
 };
@@ -45,35 +85,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
   },
   list: {
     paddingBottom: 20,
   },
-  exerciseItem: {
+  listItem: {
+    marginBottom: 15,
     backgroundColor: '#fff',
-    padding: 15,
     borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
   },
-  exerciseType: {
-    fontSize: 16,
-    fontWeight: '600',
+  avatar: {
+    backgroundColor: '#e0e0e0',
   },
-  exerciseDescription: {
-    fontSize: 14,
-    color: '#555',
+  startButton: {
+    backgroundColor: '#007bff',
+  },
+  resetButton: {
+    marginTop: 20,
+    backgroundColor: '#d9534f',
   },
 });
 

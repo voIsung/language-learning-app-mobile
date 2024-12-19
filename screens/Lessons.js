@@ -1,59 +1,64 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { List, Avatar, Button, Tooltip } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import { List, Avatar, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { useAppContext } from '../context/AppContext';
 
 const Lessons = () => {
+  const { lessonHistory, setLessonHistory } = useAppContext();
   const navigation = useNavigation();
+  const [isResetting, setIsResetting] = useState(false); // Loading state for reset button
 
-  // Mocked data for lessons
   const lessons = [
-    { id: '1', title: 'Introduction to Grammar', status: 'completed', tooltip: 'Learn the basics of grammar.' },
-    { id: '2', title: 'Intermediate Vocabulary', status: 'in-progress', tooltip: 'Expand your vocabulary.' },
-    { id: '3', title: 'Advanced Writing', status: 'not-started', tooltip: 'Improve your writing skills.' },
+    { id: '1', title: 'Grammar' },
+    { id: '2', title: 'Vocabulary' },
+    { id: '3', title: 'Writing' },
   ];
 
-  // Navigate to LessonDetails screen
-  const handleStartLesson = (lessonId) => {
-    navigation.navigate('LessonDetails', { lessonId });
+  const resetLessons = () => {
+    Alert.alert(
+      'Reset Lessons',
+      'Are you sure you want to reset all lessons? This will mark all lessons as incomplete.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: () => {
+            setIsResetting(true);
+            setLessonHistory([]); // Clear the lesson history
+            setTimeout(() => {
+              setIsResetting(false);
+              console.log('Lesson history reset');
+            }, 500); // Optional delay for better UX
+          },
+        },
+      ]
+    );
   };
 
-  // Render each lesson item
   const renderLessonItem = ({ item }) => {
-    // Determine icon based on status
-    let statusIcon;
-    switch (item.status) {
-      case 'completed':
-        statusIcon = 'check-circle'; // Completed
-        break;
-      case 'in-progress':
-        statusIcon = 'progress-clock'; // In Progress
-        break;
-      default:
-        statusIcon = 'circle-outline'; // Not Started
-    }
+    const isCompleted = lessonHistory.some((lesson) => lesson.lessonId === item.id);
 
     return (
       <List.Item
         title={item.title}
-        description={`Status: ${item.status}`}
+        description={isCompleted ? 'Completed' : 'Not Started'}
         left={() => (
-          <Avatar.Icon 
-            size={40} 
-            icon={statusIcon} 
-            style={[styles.avatar, item.status === 'completed' && styles.completedIcon]} 
+          <Avatar.Icon
+            size={40}
+            icon={isCompleted ? 'check-circle' : 'circle-outline'}
+            style={isCompleted ? styles.completedIcon : styles.defaultIcon}
           />
         )}
         right={() => (
-          <Tooltip title={item.tooltip}>
-            <Button 
-              mode="contained" 
-              style={styles.startButton} 
-              onPress={() => handleStartLesson(item.id)}
-            >
-              Start
-            </Button>
-          </Tooltip>
+          <Button
+            mode="contained"
+            onPress={() => navigation.navigate('LessonDetails', { lessonId: item.id, lessonTitle: item.title })}
+            style={styles.viewButton}
+          >
+            View Lesson
+          </Button>
         )}
         style={styles.listItem}
       />
@@ -62,13 +67,20 @@ const Lessons = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Lessons</Text>
       <FlatList
         data={lessons}
         keyExtractor={(item) => item.id}
         renderItem={renderLessonItem}
         contentContainerStyle={styles.list}
       />
+      <Button
+        mode="contained"
+        onPress={resetLessons}
+        style={styles.resetButton}
+        loading={isResetting}
+      >
+        Reset Lessons
+      </Button>
     </View>
   );
 };
@@ -77,31 +89,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
   },
   list: {
     paddingBottom: 20,
   },
   listItem: {
-    marginBottom: 10,
+    marginBottom: 15,
     backgroundColor: '#fff',
     borderRadius: 8,
-    elevation: 2,
-  },
-  avatar: {
-    backgroundColor: '#e0e0e0',
   },
   completedIcon: {
     backgroundColor: '#4caf50',
   },
-  startButton: {
+  defaultIcon: {
+    backgroundColor: '#e0e0e0',
+  },
+  viewButton: {
     backgroundColor: '#007bff',
+  },
+  resetButton: {
+    marginTop: 20,
+    backgroundColor: '#d9534f',
   },
 });
 
