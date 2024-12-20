@@ -1,2 +1,4 @@
 npx expo start;
-npm i
+npm i;
+json-server --watch db.json --port 3000;
+

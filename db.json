@@ -1,0 +1,57 @@
+{
+  "skillLevel": {
+    "currentLevel": "Advanced"
+  },
+  "lessons": [
+    {
+      "id": 1,
+      "title": "Grammar",
+      "status": "completed"
+    },
+    {
+      "id": 2,
+      "title": "Vocabulary",
+      "status": "incomplete"
+    },
+    {
+      "id": 3,
+      "title": "Writing",
+      "status": "completed"
+    }
+  ],
+  "exercises": [
+    {
+      "exerciseId": 1,
+      "title": "Grammar Exercise",
+      "score": 85
+    },
+    {
+      "exerciseId": 2,
+      "title": "Vocabulary Quiz",
+      "score": 92
+    },
+    {
+      "exerciseId": 3,
+      "title": "Writing Challenge",
+      "score": 75
+    },
+    {
+      "id": "1d60",
+      "exerciseId": 1,
+      "title": "Grammar Exercise",
+      "score": 85
+    },
+    {
+      "id": "dc72",
+      "exerciseId": 2,
+      "title": "Vocabulary Quiz",
+      "score": 92
+    },
+    {
+      "id": "15e4",
+      "exerciseId": 3,
+      "title": "Writing Challenge",
+      "score": 75
+    }
+  ]
+}

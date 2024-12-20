@@ -2,19 +2,36 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useAppContext } from '../context/AppContext';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_BASE_URL = 'http://192.168.43.143:3000';// Replace localhost with your computer's IP if needed
 
 const LessonDetails = ({ route }) => {
   const { lessonId, lessonTitle } = route.params;
   const { lessonHistory, setLessonHistory } = useAppContext();
 
-  const isLessonCompleted = (lessonId) =>
-    lessonHistory.some((lesson) => lesson.lessonId === lessonId);
+  const isLessonCompleted = lessonHistory.some((lesson) => lesson.lessonId === lessonId);
 
-  const markLessonCompleted = () => {
-    if (!isLessonCompleted(lessonId)) {
+  const markLessonCompleted = async () => {
+    if (!isLessonCompleted) {
       const updatedLessonHistory = [...lessonHistory, { lessonId, status: 'completed' }];
       setLessonHistory(updatedLessonHistory);
-      console.log('Lesson marked as completed:', lessonId, updatedLessonHistory);
+
+      try {
+        // Update AsyncStorage
+        console.log('Updating AsyncStorage...');
+        const storedLessonHistory = JSON.stringify(updatedLessonHistory);
+        await AsyncStorage.setItem('lessonHistory', storedLessonHistory);
+
+        // Update JSON server
+        console.log('Updating JSON Server...');
+        await axios.patch(`${API_BASE_URL}/lessons/${lessonId}`, { status: 'completed' });
+
+        console.log('Lesson marked as completed:', lessonId);
+      } catch (error) {
+        console.error('Failed to update lesson:', error);
+      }
     }
   };
 
@@ -22,15 +39,15 @@ const LessonDetails = ({ route }) => {
     <View style={styles.container}>
       <Text style={styles.header}>{lessonTitle}</Text>
       <Text style={styles.lessonContent}>
-        This is the content of the lesson. Here, you can add detailed information, examples, and exercises for the user to complete.
+        This is the content of the lesson. Add detailed information, examples, and exercises here.
       </Text>
       <Button
         mode="contained"
         onPress={markLessonCompleted}
-        disabled={isLessonCompleted(lessonId)}
+        disabled={isLessonCompleted}
         style={styles.markButton}
       >
-        {isLessonCompleted(lessonId) ? 'Completed' : 'Mark as Completed'}
+        {isLessonCompleted ? 'Completed' : 'Mark as Completed'}
       </Button>
     </View>
   );

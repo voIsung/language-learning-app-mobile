@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useAppContext } from '../context/AppContext';
 
 const ExerciseTasks = ({ route }) => {
-  const { exerciseType } = route.params;
+  const { exerciseType } = route.params; // Pass exerciseType as a unique identifier
   const { exerciseResults, setExerciseResults } = useAppContext();
 
   const [score, setScore] = useState(() => {
