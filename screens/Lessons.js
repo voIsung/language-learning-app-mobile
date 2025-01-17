@@ -26,7 +26,7 @@ const Lessons = () => {
   const resetLessons = () => {
     Alert.alert(
       'Reset Lessons',
-      'Are you sure you want to reset all lessons?',
+      'Are you sure you want to reset all lessons? This will mark all lessons as incomplete.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -93,33 +93,28 @@ const Lessons = () => {
 
   return (
     <View style={styles.container}>
-      {/* Cały ekran: */}
       {isCameraVisible && (
-        <View style={styles.cameraContainer}>
-          {/* CameraView wypełniający rodzica */}
-          <CameraView
-            style={styles.camera}
-            facing="back"
-            onBarCodeScanned={handleBarcodeScanned}
-          >
-            {Platform.OS === 'android' ? <StatusBar hidden /> : null}
-            <View style={styles.cameraOverlay}>
-              <Icon
-                name="close"
-                size={40}
-                color="white"
-                onPress={() => {
-                  setIsCameraVisible(false);
-                  qrLock.current = false;
-                }}
-                style={styles.cameraCloseButton}
-              />
-            </View>
-          </CameraView>
-        </View>
+        <CameraView
+          style={styles.camera}
+          facing="back"
+          onBarCodeScanned={handleBarcodeScanned}
+          
+        >
+          <View style={styles.cameraOverlay}>
+            <Icon
+              name="close"
+              size={40}
+              color="white"
+              onPress={() => {
+                setIsCameraVisible(false);
+                qrLock.current = false;
+              }}
+              style={styles.cameraCloseButton}
+            />
+          </View>
+        </CameraView>
       )}
 
-      {/* Główna część UI, jeśli kamera niewidoczna */}
       {!isCameraVisible && (
         <>
           <View style={styles.middleButtonsContainer}>
@@ -182,19 +177,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  // Kontener, który wypełni cały ekran
-  cameraContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    // Można też użyć: ...StyleSheet.absoluteFillObject
-    zIndex: 9999, // żeby kamera była na wierzchu
-  },
-  // Sama kamera na 100% kontenera
   camera: {
     flex: 1,
+    width: '100%',
   },
   cameraOverlay: {
     flex: 1,
