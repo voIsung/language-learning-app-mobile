@@ -10,10 +10,18 @@ import * as Linking from 'expo-linking';
 const Lessons = () => {
   const { lessonHistory, setLessonHistory } = useAppContext();
   const navigation = useNavigation();
+
+  // Camera permissions
   const [permission, requestPermission] = useCameraPermissions();
   const isPermissionGranted = Boolean(permission?.granted);
+
+  // Show/hide camera
   const [isCameraVisible, setIsCameraVisible] = useState(false);
+
+  // Lock to prevent multiple QR triggers
   const qrLock = useRef(false);
+
+  // (Fragment z AppState został usunięty)
 
   const [isResetting, setIsResetting] = useState(false);
 
@@ -78,11 +86,16 @@ const Lessons = () => {
     );
   };
 
+  // Handle scanning the QR code (YouTube-like approach)
   const handleBarcodeScanned = ({ data }) => {
+    // If there's data and we haven't locked scanning
     if (data && !qrLock.current) {
+      // Lock scanning to prevent multiple triggers
       qrLock.current = true;
+      // Optional short delay before opening
       setTimeout(async () => {
         try {
+          // Attempt to open the scanned link
           await Linking.openURL(data);
         } catch (error) {
           console.warn('Failed to open URL:', error);
@@ -93,19 +106,23 @@ const Lessons = () => {
 
   return (
     <View style={styles.container}>
+      {/* Show camera if isCameraVisible */}
       {isCameraVisible && (
         <CameraView
           style={styles.camera}
           facing="back"
-          onBarCodeScanned={handleBarcodeScanned}
-          
+          onBarcodeScanned={handleBarcodeScanned}
         >
+          {/* On Android, optionally hide the status bar when scanning */}
+          {Platform.OS === 'android' ? <StatusBar hidden /> : null}
+          {/* Add an overlay with a close button, etc. */}
           <View style={styles.cameraOverlay}>
             <Icon
               name="close"
               size={40}
               color="white"
               onPress={() => {
+                // Hide the camera and reset the lock
                 setIsCameraVisible(false);
                 qrLock.current = false;
               }}
@@ -115,6 +132,7 @@ const Lessons = () => {
         </CameraView>
       )}
 
+      {/* If camera is not visible, show the regular UI */}
       {!isCameraVisible && (
         <>
           <View style={styles.middleButtonsContainer}>
@@ -125,7 +143,7 @@ const Lessons = () => {
               onPress={() => {
                 if (isPermissionGranted) {
                   setIsCameraVisible(true);
-                  qrLock.current = false;
+                  qrLock.current = false; // reset lock whenever we open camera
                 } else {
                   Alert.alert(
                     'Permission Required',
