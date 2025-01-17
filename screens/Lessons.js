@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, FlatList, StyleSheet, Alert, Text, Pressable, Platform, StatusBar } from 'react-native';
 import { List, Avatar, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../context/AppContext';
+import { useCameraPermissions, CameraView } from 'expo-camera';
+import Icon from 'react-native-vector-icons/Ionicons';
+import * as Linking from 'expo-linking';
 
 const Lessons = () => {
   const { lessonHistory, setLessonHistory } = useAppContext();
   const navigation = useNavigation();
-  const [isResetting, setIsResetting] = useState(false); // Loading state for reset button
+  const [permission, requestPermission] = useCameraPermissions();
+  const isPermissionGranted = Boolean(permission?.granted);
+  const [isCameraVisible, setIsCameraVisible] = useState(false);
+  const qrLock = useRef(false);
+
+  const [isResetting, setIsResetting] = useState(false);
 
   const lessons = [
     { id: '1', title: 'Grammar' },
@@ -18,7 +26,7 @@ const Lessons = () => {
   const resetLessons = () => {
     Alert.alert(
       'Reset Lessons',
-      'Are you sure you want to reset all lessons? This will mark all lessons as incomplete.',
+      'Are you sure you want to reset all lessons?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -26,11 +34,11 @@ const Lessons = () => {
           style: 'destructive',
           onPress: () => {
             setIsResetting(true);
-            setLessonHistory([]); // Clear the lesson history
+            setLessonHistory([]);
             setTimeout(() => {
               setIsResetting(false);
               console.log('Lesson history reset');
-            }, 500); // Optional delay for better UX
+            }, 500);
           },
         },
       ]
@@ -54,7 +62,12 @@ const Lessons = () => {
         right={() => (
           <Button
             mode="contained"
-            onPress={() => navigation.navigate('LessonDetails', { lessonId: item.id, lessonTitle: item.title })}
+            onPress={() =>
+              navigation.navigate('LessonDetails', {
+                lessonId: item.id,
+                lessonTitle: item.title,
+              })
+            }
             style={styles.viewButton}
           >
             View Lesson
@@ -65,30 +78,135 @@ const Lessons = () => {
     );
   };
 
+  const handleBarcodeScanned = ({ data }) => {
+    if (data && !qrLock.current) {
+      qrLock.current = true;
+      setTimeout(async () => {
+        try {
+          await Linking.openURL(data);
+        } catch (error) {
+          console.warn('Failed to open URL:', error);
+        }
+      }, 500);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <FlatList
-        data={lessons}
-        keyExtractor={(item) => item.id}
-        renderItem={renderLessonItem}
-        contentContainerStyle={styles.list}
-      />
-      <Button
-        mode="contained"
-        onPress={resetLessons}
-        style={styles.resetButton}
-        loading={isResetting}
-      >
-        Reset Lessons
-      </Button>
+      {/* Cały ekran: */}
+      {isCameraVisible && (
+        <View style={styles.cameraContainer}>
+          {/* CameraView wypełniający rodzica */}
+          <CameraView
+            style={styles.camera}
+            facing="back"
+            onBarCodeScanned={handleBarcodeScanned}
+          >
+            {Platform.OS === 'android' ? <StatusBar hidden /> : null}
+            <View style={styles.cameraOverlay}>
+              <Icon
+                name="close"
+                size={40}
+                color="white"
+                onPress={() => {
+                  setIsCameraVisible(false);
+                  qrLock.current = false;
+                }}
+                style={styles.cameraCloseButton}
+              />
+            </View>
+          </CameraView>
+        </View>
+      )}
+
+      {/* Główna część UI, jeśli kamera niewidoczna */}
+      {!isCameraVisible && (
+        <>
+          <View style={styles.middleButtonsContainer}>
+            <Pressable onPress={requestPermission}>
+              <Text style={styles.plainTextButton}>Request Permissions</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                if (isPermissionGranted) {
+                  setIsCameraVisible(true);
+                  qrLock.current = false;
+                } else {
+                  Alert.alert(
+                    'Permission Required',
+                    'Camera permission is required to use this feature.'
+                  );
+                }
+              }}
+              disabled={!isPermissionGranted}
+            >
+              <Text
+                style={[
+                  styles.plainTextButton,
+                  { opacity: !isPermissionGranted ? 0.5 : 1 },
+                ]}
+              >
+                Scan QR Code
+              </Text>
+            </Pressable>
+          </View>
+
+          <FlatList
+            data={lessons}
+            keyExtractor={(item) => item.id}
+            renderItem={renderLessonItem}
+            contentContainerStyle={styles.list}
+          />
+
+          <Button
+            mode="contained"
+            onPress={resetLessons}
+            style={styles.resetButton}
+            loading={isResetting}
+          >
+            Reset Lessons
+          </Button>
+        </>
+      )}
     </View>
   );
 };
+
+export default Lessons;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  // Kontener, który wypełni cały ekran
+  cameraContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    // Można też użyć: ...StyleSheet.absoluteFillObject
+    zIndex: 9999, // żeby kamera była na wierzchu
+  },
+  // Sama kamera na 100% kontenera
+  camera: {
+    flex: 1,
+  },
+  cameraOverlay: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  cameraCloseButton: {
+    margin: 20,
+  },
+  middleButtonsContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   list: {
     paddingBottom: 20,
@@ -96,7 +214,7 @@ const styles = StyleSheet.create({
   listItem: {
     marginBottom: 15,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 10,
   },
   completedIcon: {
     backgroundColor: '#4caf50',
@@ -111,6 +229,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#d9534f',
   },
+  plainTextButton: {
+    fontSize: 16,
+    color: '#007bff',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
 });
-
-export default Lessons;
